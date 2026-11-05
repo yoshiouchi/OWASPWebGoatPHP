@@ -42,6 +42,13 @@ Workshop Mode:
 * Commit your changes
 * Create a pull request
 
+### AI Scan pull request test fixtures
+
+`ai-scan-fixtures/` contains five intentionally vulnerable, standalone PHP
+endpoints for testing pull request scanning, not additional WebGoat lessons.
+See its README for the intended findings and isolated local setup. Never deploy
+these endpoints or merge this test branch into a production application.
+
 ### Adding a lesson/challenge
 Adding a new challenge is very simple. All the challenges must be present in 'challenges' directory and must extend class 'BaseLesson'. A template is provided in template/SampleLesson. The name of the directory must be same as the name of the class in index.php. Any static content like images, scripts etc. must be placed inside a sub-directory 'static' within the lesson directory.
 
