@@ -34,6 +34,7 @@ jobs:
           python3 - <<'PY'
           import json
           import os
+          import time
           import urllib.error
           import urllib.request
 
@@ -52,7 +53,7 @@ jobs:
           base = f"https://api.github.com/repos/{repository}/pulls/{number}"
           marker = "<!-- japanese-security-translation -->"
 
-          def request(url, data=None):
+          def request(url, data=None, retries=0):
               headers = {
                   "Accept": "application/vnd.github+json",
                   "Authorization": f"Bearer {token}",
@@ -61,12 +62,22 @@ jobs:
               }
               body = None if data is None else json.dumps(data).encode("utf-8")
               req = urllib.request.Request(url, data=body, headers=headers)
-              try:
-                  with urllib.request.urlopen(req, timeout=90) as response:
-                      return json.load(response)
-              except urllib.error.HTTPError as error:
-                  detail = error.read().decode("utf-8", errors="replace")
-                  raise RuntimeError(f"HTTP {error.code} from {url}: {detail}") from error
+              for attempt in range(retries + 1):
+                  try:
+                      with urllib.request.urlopen(req, timeout=90) as response:
+                          response_body = response.read()
+                          content_type = response.headers.get("Content-Type", "unknown")
+                      return json.loads(response_body)
+                  except json.JSONDecodeError as error:
+                      if attempt == retries:
+                          raise RuntimeError(
+                              f"Expected a JSON response from {url}, but received "
+                              f"{len(response_body)} bytes with Content-Type {content_type}."
+                          ) from error
+                      time.sleep(2 ** attempt)
+                  except urllib.error.HTTPError as error:
+                      detail = error.read().decode("utf-8", errors="replace")
+                      raise RuntimeError(f"HTTP {error.code} from {url}: {detail}") from error
 
           comments = []
           page = 1
@@ -112,6 +123,7 @@ jobs:
                       ],
                       "max_tokens": 4000,
                   },
+                  retries=2,
               )
               choice = result["choices"][0]
               translation = choice["message"]["content"]
