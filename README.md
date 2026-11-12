@@ -42,6 +42,22 @@ Workshop Mode:
 * Commit your changes
 * Create a pull request
 
+### Japanese translations of security review comments
+The **Translate security review comments** workflow uses GitHub Models to reply
+in Japanese to top-level review comments from `github-advanced-security[bot]`.
+It does not change the original findings. Other review comments from that bot
+are also translated. Translations are AI-generated and should be reviewed.
+
+The workflow attempts to run when a new review comment is created. For existing
+findings, or if the automatic event does not run, select the workflow under
+**Actions**, choose **Run workflow**, and enter the pull request number. Repeat
+the manual run after a failure; existing translation replies are skipped. The
+workflow must first be merged into the default branch. GitHub Actions and
+GitHub Models access are required; model usage may be subject to limits or
+charges. Findings are sent to GitHub Models for translation. Automatic runs
+for forked pull requests may receive a read-only token; use the manual run if
+they cannot post replies.
+
 ### Adding a lesson/challenge
 Adding a new challenge is very simple. All the challenges must be present in 'challenges' directory and must extend class 'BaseLesson'. A template is provided in template/SampleLesson. The name of the directory must be same as the name of the class in index.php. Any static content like images, scripts etc. must be placed inside a sub-directory 'static' within the lesson directory.
 
